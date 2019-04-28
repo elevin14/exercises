@@ -1,6 +1,7 @@
 #lang sicp
 
 ; Exercises for SICP chapter 1-2
+; Up to exerceise 1.22
 
 ; Exercise 1.10
 (define (A x y)
@@ -149,4 +150,6 @@
         ((= (remainder lower-limit 2) 0) (search-for-primes (+ lower-limit 1) upper-limit))
         (else (search-for-primes (+ lower-limit 2) upper-limit))))
 
-(search-for-primes 2 30)
+(search-for-primes 10000 10050)
+
+; Exerceise 1.23
