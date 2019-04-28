@@ -86,10 +86,67 @@
 ; Exercise 1.18
 (define (fast-mult-iter a b)
   (define (fast-mult-helper a b n)
-  (cond ((= b 1) (+ a n))
-        ((even? b) (fast-mult-helper (double a) (half b) n))
-        (else (fast-mult-helper a (- b 1) (+ n a)))))
+    (cond ((= b 1) (+ a n))
+          ((even? b) (fast-mult-helper (double a) (half b) n))
+          (else (fast-mult-helper a (- b 1) (+ n a)))))
   (fast-mult-helper a b 0))
 
 (fast-mult-iter 9 12)
- 
+
+; Exercise 1.19
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   (+ (* p p) (* q q)) ; compute p
+                   (+ (* 2 p q) (* q q)) ; compute q
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
+
+(fib 7)
+
+; Exercise 1.21
+(define (smallest-divisor n) (find-divisor n 2))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1)))))
+(define (divides? a b) (= (remainder b a) 0))
+
+(smallest-divisor 199)
+(smallest-divisor 1999)
+(smallest-divisor 19999)
+
+; Exercise 1.22
+(define (prime? n)
+  (= n (smallest-divisor n)))
+
+(define (timed-prime-test n)
+  (newline)
+  (display n)
+  (start-prime-test n (runtime)))
+
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (report-prime (- (runtime) start-time))))
+
+(define (report-prime elapsed-time)
+  (display " *** ")
+  (display elapsed-time))
+
+(define (search-for-primes lower-limit upper-limit)
+  (timed-prime-test lower-limit)
+  (cond ((> lower-limit (- upper-limit 2)) (display "Done"))
+        ((= (remainder lower-limit 2) 0) (search-for-primes (+ lower-limit 1) upper-limit))
+        (else (search-for-primes (+ lower-limit 2) upper-limit))))
+
+(search-for-primes 2 30)
