@@ -3,30 +3,6 @@
 ; Exercises for SICP chapter 1.3.3
 
 ; Helpers pulled from earlier assignments or text
-(define (smallest-divisor n) (find-divisor n 2))
-
-(define (find-divisor n test-divisor)
-  (cond ((> (square test-divisor) n) n)
-        ((divides? test-divisor n) test-divisor)
-        (else (find-divisor n (+ test-divisor 1)))))
-(define (divides? a b) (= (remainder b a) 0))
-
-(define (prime? n)
-  (= n (smallest-divisor n)))
-
-(define (square n) (* n n))
-
-(define (gcd a b)
-  (if (= b 0)
-      a
-      (gcd b (remainder a b))))
-
-(define (cube x) (* x x x))
-
-(define (inc n) (+ n 1))
-
-(define (identity n) n)
-
 (define tolerance 0.00001)
 
 (define (fixed-point f first-guess)
