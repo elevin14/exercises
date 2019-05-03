@@ -102,4 +102,20 @@
   (lambda (guess)
     (if (good-enough? guess)
         guess
-        ((iterative-imporve good-enough? improve) (improve guess)))))
+        ((iterative-improve good-enough? improve) (improve guess)))))
+
+(define (sqrt x)
+  ((iterative-improve
+   (lambda (n) (< (abs (- (square n) x)) 0.001))
+   (lambda (n) (average n (/ x n))))
+   2.0))
+
+(sqrt 16)
+
+(define (fixed-point-new f initial-guess)
+  ((iterative-improve
+    (lambda (n) (< (abs (- n (f n))) 0.00001))
+    (lambda (n) (f n)))
+   initial-guess))
+
+(fixed-point-new cos 1.0)
