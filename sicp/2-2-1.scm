@@ -18,6 +18,12 @@
       list2
       (cons (car list1) (append (cdr list1) list2))))
 
+(define (map proc items)
+  (if (null? items)
+      nil
+      (cons (proc (car items))
+            (map proc (cdr items)))))
+
 ; Exercise 2.17
 (define (last-pair list1) (list-ref list1 (- (length list1) 1)))
 
@@ -69,3 +75,34 @@
 
 (same-parity 1 2 3 4 5 6 7)
 (same-parity 2 3 4 5 6 7)
+
+; Exercise 2.21
+(define (square x) (* x x))
+
+(define (square-list items)
+  (if (null? items)
+      nil
+      (cons (square (car items)) (square-list (cdr items)))))
+
+(define (square-list2 items)
+  (map (lambda (x) (square x)) items))
+
+(square-list (list 1 2 3 4))
+(square-list2 (list 1 2 3 4))
+
+; Exercise 2.22
+; Louis's second method will not work because you are (cons answer...), which does not form a
+; correct list structure. You would need to append the answer and square lists.
+
+; Exercise 2.23
+(define (for-each proc items)
+  (if (null? items)
+      #t
+      ((proc (car items))
+       (for-each proc (cdr items)))))
+
+(for-each (lambda (x)
+            (newline)
+            (display x))
+          (list 57 321 88))
+
