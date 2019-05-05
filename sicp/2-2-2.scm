@@ -1,6 +1,6 @@
 #lang sicp
 
-; Exercises for SICP chapter 2.2.1
+; Exercises for SICP chapter 2.2.2
 
 ; Helpers pulled from earlier assignments or text
 (define (list-ref items n)
@@ -18,54 +18,62 @@
       list2
       (cons (car list1) (append (cdr list1) list2))))
 
-; Exercise 2.17
-(define (last-pair list1) (list-ref list1 (- (length list1) 1)))
+(define (reverse x)
+  (if (= (length x) 1)
+      x
+      (append (reverse (cdr x)) (cons (car x) nil))))
 
-(last-pair (list 23 72 149 34))
-(last-pair (list 1))
+(define (count-leaves x)
+  (cond ((null? x) 0)
+        ((not (pair? x)) 1)
+        (else (+ (count-leaves (car x))
+                 (count-leaves (cdr x))))))
 
-; Exercise 2.18
-(define (reverse list1)
-  (if (= (length list1) 1)
-      list1
-      (append (reverse (cdr list1)) (cons (car list1) nil))))
+; Exercise 2.24
+(list 1 (list 2 (list 3 4)))
 
-(reverse (list 1 4 9 16 25))
+; Exercise 2.25
+(car (cdaddr (list 1 3 (list 5 7) 9)))
+(caar (list (list 7)))
+(cadadr (cadadr (cadadr (list 1 (list 2 (list 3 (list 4 (list 5 (list 6 7)))))))))
 
-; Exercise 2.19
-(define (cc amount coin-values)
-  (cond ((= amount 0) 1)
-        ((or (< amount 0) (no-more? coin-values)) 0)
-        (else
-         (+ (cc amount
-                (except-first-denomination
-                 coin-values))
-            (cc (- amount
-                   (first-denomination
-                    coin-values))
-                coin-values)))))
+; Exercise 2.26
+(define x (list 1 2 3))
+(define y (list 4 5 6))
 
-(define us-coins (list 50 25 10 5 1))
-(define uk-coins (list 100 50 20 10 5 2 1 0.5))
+(append x y)
+(cons x y)
+(list x y)
 
-(define (first-denomination coins) (car coins))
-(define (except-first-denomination coins) (cdr coins))
-(define (no-more? coins) (= (length coins) 0))
+; Exercise 2.27
+(define (deep-reverse x)
+  (cond((null? x) nil)
+       ((not (pair? x)) x)
+       (else (append (deep-reverse (cdr x)) (cons (deep-reverse (car x)) nil)))))
 
-(cc 100 us-coins)
-; The order in the coins list does not affect the answer, only effeciency of the algorithm.
-; The invariant of answer = (answer-coin value) + (answer without that coin) does not depend
-; on size of the coin.
+(define l3 (list (list 1 2) (list 3 4)))
+(reverse l3)
+(deep-reverse l3)
 
-; Exercise 2.20
-(define (same-parity i . w)
-  (define (same-parity-iter i o w)
-    (if (= 0 (length w))
-        o
-        (if (= (remainder (car w) 2) (remainder i 2))
-            (same-parity-iter i (append o (list (car w))) (cdr w))
-            (same-parity-iter i o (cdr w)))))
-  (same-parity-iter i (list i) w))
+; Exercise 2.28
+(define (fringe x)
+  (cond ((null? x) nil)
+        ((not (pair? x)) (list x))
+        (else (append (fringe (car x)) (fringe (cdr x))))))
 
-(same-parity 1 2 3 4 5 6 7)
-(same-parity 2 3 4 5 6 7)
+(define l4 (list (list 1 2 (list 3)) (list 4 5)))
+(fringe l4)
+
+; Exerceise 2.29
+(define (make-mobile left right)
+  (list left right))
+
+(define (make-branch length structure)
+  (list length structure))
+
+(define (left-branch m) (list-ref m 0))
+(define (right-branch m) (list-ref m 1))
+(define (branch-structure b)(list-ref b 1))
+
+(define (total-weight m)
+  (cond ((
