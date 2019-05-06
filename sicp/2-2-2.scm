@@ -3,6 +3,8 @@
 ; Exercises for SICP chapter 2.2.2
 
 ; Helpers pulled from earlier assignments or text
+(define (square x) (* x x))
+
 (define (list-ref items n)
   (if (= n 0)
       (car items)
@@ -73,7 +75,71 @@
 
 (define (left-branch m) (list-ref m 0))
 (define (right-branch m) (list-ref m 1))
+(define (branch-length b) (list-ref b 0))
 (define (branch-structure b)(list-ref b 1))
 
 (define (total-weight m)
-  (cond ((
+  (define (total-weight-branch b)
+    (if (number? (branch-structure b))
+        (branch-structure b)
+        (total-weight (branch-structure b))))
+  (+ (total-weight-branch (left-branch m)) (total-weight-branch (right-branch m))))
+
+(total-weight (make-mobile (make-branch 5 5) (make-branch 1 (make-mobile (make-branch 5 8) (make-branch 4 9)))))
+
+(define (balanced? m)
+  (define (total-weight-branch b)
+    (if (number? (branch-structure b))
+        (branch-structure b)
+        (total-weight (branch-structure b))))
+  (define (balanced?-branch b)
+    (if (number? (branch-structure b))
+        #t
+        (balanced? (branch-structure b))))
+  (and (and (balanced?-branch (left-branch m)) (balanced?-branch (right-branch m)))
+       (= (* (total-weight-branch (left-branch m)) (branch-length (left-branch m)))
+          (* (total-weight-branch (right-branch m)) (branch-length (right-branch m))))))
+
+(balanced? (make-mobile (make-branch 5 5) (make-branch 1 (make-mobile (make-branch 5 8) (make-branch 4 9)))))
+(balanced? (make-mobile (make-branch 2 5) (make-branch 1 (make-mobile (make-branch 1 5) (make-branch 1 5)))))
+
+; If defitions of make-mobile and make-branch are changed, only the left-branch, right-branch, branch-length,
+; and branch-structure defitions need to be changed. The higher functions will stay the same.
+
+; Exercise 2.30
+(define (square-tree tree)
+  (cond ((null? tree) nil)
+        ((not (pair? tree)) (* tree tree))
+        (else (cons (square-tree (car tree))
+                    (square-tree (cdr tree))))))
+
+(define (square-tree-2 tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (square-tree-2 sub-tree)
+             (* sub-tree sub-tree)))
+       tree))
+
+(square-tree-2 (list 1 (list 2 (list 3 4) 5) (list 6 7)))
+
+; Exercise 2.31
+(define (tree-map f tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (tree-map f sub-tree)
+             (f sub-tree)))
+       tree))
+
+(define (square-tree-3 tree) (tree-map square tree))
+(square-tree-3 (list 1 (list 2 (list 3 4) 5) (list 6 7)))
+
+; Exercise 2.32
+(define (subsets s)
+  (if (null? s)
+      (list nil)
+      (let ((rest (subsets (cdr s))))
+        (append rest (map (lambda (x) (cons (car s) x)) rest)))))
+
+(subsets (list 1 2 3))
+
+
