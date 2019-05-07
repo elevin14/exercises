@@ -41,11 +41,10 @@ print(nonincreasing_insertion_sort([31,41,59,26,41,58]))
 #              If value is found in loop, then out is updated to that index.
 # Termination: Return value is given. Output is either nil or value of index
 def linear_search(arr, v):
-    out = None
     for i in range(0,len(arr)):
         if arr[i] == v:
-            out = i
-    return out
+            return i
+    return None
 
 print(linear_search([1,4,6,3,2],3))
 print(linear_search([1,4,6,3,2],8))
