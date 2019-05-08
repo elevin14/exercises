@@ -58,18 +58,46 @@
   (accumulate + 0 (map * v w)))
 
 (define (matrix-*-vector m v)
-  (map (lambda (x) (dot-product x v)) m))
+  (map (lambda (row) (dot-product row v)) m))
 
 (define (transpose m)
   (accumulate-n cons nil m))
 
 (define (matrix-*-matrix m n)
   (let ((cols (transpose n)))
-    (map (lambda (row) (accumulate-n matrix-*-vector cols row)) m)))
+    (map (lambda (row) (matrix-*-vector cols row)) m)))
 
  
 (dot-product (list 1 2 0) (list 2 7 1))
 (matrix-*-vector (list (list 1 2 3) (list 3 4 5)) (list 5 6 1))
 (transpose (list (list 1 1 1 1) (list 2 2 2 2)))
-(matrix-*-matrix (list 1 1 1 1) (list (list 2) (list 2) (list 2) (list 2)))
+(matrix-*-matrix (list (list 1 1 1 1) (list 2 2 2 2)) (list (list 2 3) (list 2 3) (list 2 3) (list 2 3)))
 
+; Exercise 2.38
+(define (fold-left op initial sequence)
+  (define (iter result rest)
+    (if (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter initial sequence))
+
+(define fold-right accumulate)
+
+(fold-right / 1 (list 1 2 3)) ; will be 3/2
+(fold-left / 1 (list 1 2 3)) ; will be 1/6
+(fold-right list nil (list 1 2 3)) ; will be (1 2 3) was (1 (2 (3 ())))
+(fold-left list nil (list 1 2 3)) ; will be (3 2 1) was (((() 1) 2) 3)
+
+; if order of arguments does not matter, fold left and right will provide same results.
+(fold-right + 0 (list 1 2 3))
+(fold-left + 0 (list 1 2 3))
+
+; Exercise 2.39
+(define (reverse sequence)
+  (fold-right (lambda (x y) (append y (list x))) nil sequence))
+(define (reverse2 sequence)
+  (fold-left (lambda (x y) (cons y x)) nil sequence))
+
+(reverse (list 1 2 3))
+(reverse2 (list 1 2 3))
