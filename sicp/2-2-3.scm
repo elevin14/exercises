@@ -16,7 +16,7 @@
                       (enumerate-tree (cdr tree))))))
 
 ; Exercise 2.33
-(define (map p sequence)
+(define (map2 p sequence)
   (accumulate (lambda (x y) (cons (p x) y)) nil sequence))
 
 (define (append seq1 seq2)
@@ -26,7 +26,7 @@
   (accumulate (lambda (x y) (+ 1 y)) 0 sequence))
 
 (append (list 1 2 3) (list 4 5 6))
-(map (lambda (x) (+ x 1)) (list 1 2 3 4))
+(map2 (lambda (x) (+ x 1)) (list 1 2 3 4))
 (length (list 1 2 3))
 
 ; Exerceise 2.34
@@ -52,4 +52,24 @@
             (accumulate-n op init (accumulate (lambda (x y) (cons (cdr x) y)) nil seqs)))))
 
 (accumulate-n + 0 (list (list 1 2 3) (list 4 5 6) (list 7 8 9) (list 10 11 12)))
+
+; Exercise 2.37
+(define (dot-product v w)
+  (accumulate + 0 (map * v w)))
+
+(define (matrix-*-vector m v)
+  (map (lambda (x) (dot-product x v)) m))
+
+(define (transpose m)
+  (accumulate-n cons nil m))
+
+(define (matrix-*-matrix m n)
+  (let ((cols (transpose n)))
+    (map (lambda (row) (accumulate-n matrix-*-vector cols row)) m)))
+
+ 
+(dot-product (list 1 2 0) (list 2 7 1))
+(matrix-*-vector (list (list 1 2 3) (list 3 4 5)) (list 5 6 1))
+(transpose (list (list 1 1 1 1) (list 2 2 2 2)))
+(matrix-*-matrix (list 1 1 1 1) (list (list 2) (list 2) (list 2) (list 2)))
 
