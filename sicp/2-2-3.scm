@@ -157,8 +157,51 @@
   (flatmap (lambda (pair)
              (map (lambda (k) (append pair (list k)))
                   (enumerate-interval 1 (- (cadr pair) 1))))
-             (unique-pairs n)))
+           (unique-pairs n)))
 
 (unique-triples 5)
 
+(define (sum-triples n s)
+  (filter (lambda (triple)
+            (= (+ (car triple) (cadr triple) (caddr triple)) s))
+          (unique-triples n)))
+
+(sum-triples 10 12)
+
 ; Exercise 2.42
+(define (queens board-size)
+  (define (queen-cols k)
+    (if (= k 0)
+        (list empty-board)
+        (filter
+         (lambda (positions) (safe? k positions))
+         (flatmap
+          (lambda (rest-of-queens)
+            (map (lambda (new-row)
+                   (adjoin-position
+                    new-row k rest-of-queens))
+                 (enumerate-interval 1 board-size)))
+          (queen-cols (- k 1))))))
+  (queen-cols board-size))
+
+(define empty-board nil)
+
+(define (adjoin-position row col l)
+  (cons (list row col) l))       
+
+(define (safe? col positions)
+  (if (> 2 (length positions))
+      #t
+      (null? 
+         (filter (lambda (position)
+                   (let ((new-row (caar positions))
+                         (new-col (cadar positions))
+                         (old-row (car position))
+                         (old-col (cadr position)))
+                     (or (= new-row old-row)
+                         (= new-col old-col)
+                         (= (- new-row new-col) (- old-row old-col))
+                         (= (- new-col old-row) (- old-col new-row)))))
+                 (cdr positions)))))
+
+(length (queens 8))
