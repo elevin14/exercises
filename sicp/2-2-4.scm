@@ -1,7 +1,28 @@
 #lang sicp
 (#%require sicp-pict)
+(#%require graphics/graphics)
+(open-graphics)
+(define vp (open-viewport "A Picture Language" 500 500))
+
 
 ; Exercises for SICP chapter 2.2.4
+
+; Helpers pulled online for graphics
+(define draw (draw-viewport vp))
+(define (clear) ((clear-viewport vp)))
+(define line (draw-line vp))
+
+(define (vector-to-posn v)
+  (make-posn (* 500 (car v)) (* 500 (cdr v))))
+
+(define (segments->painter segment-list)   
+  (lambda (frame)     
+    (for-each     
+     (lambda (segment)        
+       (line         
+        (vector-to-posn ((frame-coord-map frame) (start-segment segment)))         
+        (vector-to-posn ((frame-coord-map frame) (end-segment segment)))))      
+     segment-list)))
 
 ; Helpers pulled from earlier assignments or text
 (define shade diagonal-shading)
@@ -35,16 +56,25 @@
      (add-vect (scale-vect (xcor-vect v) (edge1-frame frame))
                (scale-vect (ycor-vect v) (edge2-frame frame))))))
 
-(define (segments->painter segment-list)
+;(define (segments->painter segment-list)
+;  (lambda (frame)
+;    (for-each
+;     (lambda (segment)
+;       (line
+;        ((frame-coord-map frame)
+;         (start-segment segment))
+;        ((frame-coord-map frame)
+;         (end-segment segment))))
+;     segment-list)))
+
+(define (transform-painter painter origin corner1 corner2)
   (lambda (frame)
-    (for-each
-     (lambda (segment)
-       (draw-line
-        ((frame-coord-map frame)
-         (start-segment segment))
-        ((frame-coord-map frame)
-         (end-segment segment))))
-     segment-list)))
+    (let ((m (frame-coord-map frame)))
+      (let ((new-origin (m origin)))
+        (painter (make-frame
+                  new-origin
+                  (sub-vect (m corner1) new-origin)
+                  (sub-vect (m corner2) new-origin)))))))
 
 ; Exercise 2.44
 (define (up-split painter n)
@@ -120,7 +150,62 @@
 (define (end-segment s) (cdr s))
 
 ; Exercise 2.49
+; Had to use draw functionality. Coordinate plane not quite working as expected.
+(define standard-frame (make-frame (make-vect 0 0) (make-vect 1 0) (make-vect 0 1)))
 
+((segments->painter (list (make-segment (make-vect 0 0) (make-vect 0 1))
+                          (make-segment (make-vect 0 1) (make-vect 1 1))
+                          (make-segment (make-vect 1 1) (make-vect 1 0))
+                          (make-segment (make-vect 1 0) (make-vect 0 0))))
+ standard-frame)
 
-(segments->painter (list (make-segment (make-vect 0 0) (make-vect 1 1))))
-                    
+((segments->painter (list (make-segment (make-vect 0 0) (make-vect 1 1))
+                          (make-segment (make-vect 0 1) (make-vect 1 0))))
+ standard-frame)
+
+((segments->painter (list (make-segment (make-vect 0 .5) (make-vect .5 1))
+                          (make-segment (make-vect .5 1) (make-vect 1 .5))
+                          (make-segment (make-vect 1 .5) (make-vect .5 0))
+                          (make-segment (make-vect .5 0) (make-vect 0 .5))))
+ standard-frame)
+
+; Exercise 2.50
+(define (flip-horiz painter)
+  (transform-painter painter
+                     (make-vect 1.0 0.0)
+                     (make-vect 0.0 0.0)
+                     (make-vect 1.0 1.0)))
+
+(define (rotate180 painter)
+  (transform-painter painter
+                     (make-vect 1.0 1.0)
+                     (make-vect 0.0 1.0)
+                     (make-vect 1.0 0.0)))
+
+(define (rotate270 painter)
+  (transform-painter painter
+                     (make-vect 0.0 1.0)
+                     (make-vect 0.0 0.0)
+                     (make-vect 1.0 1.0)))
+
+; Exercise 2.51
+(define (below painter)
+  (let ((split-point (make-vect 0.0 0.5)))
+    (let ((paint-upper
+           (transform-painter
+            painter1
+            split-point
+            (make-vect 1.0 0.5)
+            (make-vect 0.0 1.0)))
+          (paint-lower
+           (transform-painter
+            painter2
+            (make-vect 0.0 0.0)
+            (make-vect 1.0 0.0)
+            split-point)))
+      (lambda (frame)
+        (paint-upper frame)
+        (paint-lower frame)))))
+
+(define (below2 painter)
+  (rotate90 (beside (rotate270 painter) (rotate270 painter))))
